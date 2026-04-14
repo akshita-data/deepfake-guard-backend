@@ -12,7 +12,7 @@ import tempfile
 import warnings
 from pathlib import Path
 from typing import Optional
-
+from tensorflow.keras.applications.efficientnet import preprocess_input
 import cv2
 import numpy as np
 from PIL import Image
@@ -145,7 +145,7 @@ def run_cnn(face_rgb):
     if _model_is_stub or _cnn_model is None:
         return round(random.uniform(0.4, 0.9), 3)
 
-    img = face_rgb.astype(np.float32) / 255.0
+    img = preprocess_input(face_rgb.astype(np.float32))
     img = np.expand_dims(img, axis=0)
 
     pred = _cnn_model.predict(img)[0]
