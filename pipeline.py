@@ -41,10 +41,10 @@ ROOT_DIR = BASE_DIR.parent
 
 def _resolve_model_path() -> Path:
     candidates = [
-        ROOT_DIR / "models" / "best_cnn_model.h5",
-        BASE_DIR / "models" / "best_cnn_model.h5",
-        BASE_DIR / "model" / "best_cnn_model.h5",  # YOUR CASE
-        ROOT_DIR / "backend" / "model" / "best_cnn_model.h5",
+        ROOT_DIR / "models" / "pretrained_cnn.h5",
+        BASE_DIR / "models" / "pretrained_cnn.h5",
+        BASE_DIR / "model" / "pretrained_cnn.h5",  # YOUR CASE
+        ROOT_DIR / "backend" / "model" / "pretrained_cnn.h5",
     ]
 
     for p in candidates:
