@@ -7,8 +7,7 @@ from app.utils.preprocess import preprocess_image, extract_fft_features
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, "model", "best_cnn_model.h5")
-
+MODEL_PATH = os.path.join(BASE_DIR, "pretrained_cnn.h5")
 # 🔥 LOAD MODEL SAFELY
 try:
     model = load_model(MODEL_PATH, compile=False)
@@ -54,6 +53,13 @@ def predict_image_from_url(url):
     except Exception as e:
         return error_response(str(e))
 
+def error_response(msg):
+    return {
+        "result": "error",
+        "confidence": 0.0,
+        "reason": [msg],
+        "error": msg
+    }
 
 # =========================
 # CORE PIPELINE (CNN + FFT)
