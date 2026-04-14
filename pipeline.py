@@ -190,26 +190,62 @@ def run_ela(face_rgb):
 # ═════════════════════════════════════════════════════════════
 
 def analyze_image_bytes(image_bytes: bytes):
-    arr = np.frombuffer(image_bytes, np.uint8)
-    img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+    try:
+        print("➡️ Received image")
 
-    face_rgb, face_score = preprocess_face(img)
+        arr = np.frombuffer(image_bytes, np.uint8)
+        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
-    cnn = run_cnn(face_rgb)
-    fft = run_fft(img)
-    ela = run_ela(face_rgb)
+        if img is None:
+            raise ValueError("Image decoding failed")
 
-    confidence = W_CNN * cnn + W_FFT * fft
-    result = "fake" if confidence > FAKE_THRESHOLD else "real"
+        print("✅ Image decoded")
 
-    return {
-        "result": result,
-        "confidence": round(confidence, 3),
-        "reason": [
-            "High frequency anomaly" if fft > 0.5 else "Normal spectrum",
-            "CNN signal strong" if cnn > 0.7 else "Weak CNN signal"
-        ]
+        face_rgb, face_score = preprocess_face(img)
+
+        print("➡️ Running CNN")
+        cnn = run_cnn(face_rgb)
+
+        print("➡️ Running FFT")
+        fft = run_fft(img)
+
+        print("➡️ Running ELA")
+        ela = run_ela(face_rgb)
+
+        confidence = 0.5 * cnn + 0.3 * fft + 0.2 * ela
+
+        if confidence > 0.6:
+            result = "fake"
+        elif confidence < 0.4:
+            result = "real"
+        else:
+            result = "uncertain"
+
+        print("✅ Analysis complete")
+
+        return {
+    "result": result,
+    "confidence": round(confidence, 3),
+    "reason": [
+        f"CNN: {round(cnn,2)}",
+        f"FFT: {round(fft,2)}",
+        f"ELA: {round(ela,2)}"
+    ],
+    "signals": {
+        "cnn": float(cnn),
+        "fft": float(fft),
+        "ela": float(ela)
     }
+}
+
+    except Exception as e:
+        print("❌ ERROR IN PIPELINE:", str(e))
+
+        return {
+            "result": "error",
+            "confidence": 0.0,
+            "reason": [str(e)]
+        }
 def analyze_video_bytes(video_bytes: bytes):
     import cv2
     import tempfile
